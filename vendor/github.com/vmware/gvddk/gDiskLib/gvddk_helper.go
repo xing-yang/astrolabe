@@ -16,6 +16,8 @@ limitations under the License.
 
 package gDiskLib
 
+// #cgo CFLAGS: -g -Wall
+// #cgo LDFLAGS: -L../lib/vmware-vix-disklib/lib64 -lvixDiskLib
 // #include "gvddk_c.h"
 import "C"
 import (
@@ -36,13 +38,6 @@ const (
 	VIXDISKLIB_FLAG_OPEN_COMPRESSION_MASK = C.VIXDISKLIB_FLAG_OPEN_COMPRESSION_MASK
 )
 
-// Transport mode
-const (
-	NBD = "nbd"
-	NBDSSL = "nbdssl"
-	HOTADD = "hotadd"
-)
-
 // Sector size
 const VIXDISKLIB_SECTOR_SIZE = C.VIXDISKLIB_SECTOR_SIZE
 
@@ -53,9 +48,12 @@ const VIX_E_DISK_OUTOFRANGE = C.VIX_E_DISK_OUTOFRANGE
 type VixDiskLibDiskType int
 const (
 	VIXDISKLIB_DISK_MONOLITHIC_SPARSE        VixDiskLibDiskType = C.VIXDISKLIB_DISK_MONOLITHIC_SPARSE   // monolithic file, sparse,
-	VIXDISKLIB_DISK_MONOLITHIC_FLAT          VixDiskLibDiskType = C.VIXDISKLIB_DISK_MONOLITHIC_FLAT   // monolithic file, all space pre-allocated
-	VIXDISKLIB_DISK_SPLIT_SPARSE             VixDiskLibDiskType = C.VIXDISKLIB_DISK_SPLIT_SPARSE   // disk split into 2GB extents, sparse
-	VIXDISKLIB_DISK_SPLIT_FLAT               VixDiskLibDiskType = C.VIXDISKLIB_DISK_SPLIT_FLAT   // disk split into 2GB extents, pre-allocated
+	VIXDISKLIB_DISK_MONOLITHIC_FLAT          VixDiskLibDiskType = C.VIXDISKLIB_DISK_MONOLITHIC_FLAT   // monolithic file,
+	// all space pre-allocated
+	VIXDISKLIB_DISK_SPLIT_SPARSE             VixDiskLibDiskType = C.VIXDISKLIB_DISK_SPLIT_SPARSE   // disk split into 2GB extents,
+	// sparse
+	VIXDISKLIB_DISK_SPLIT_FLAT               VixDiskLibDiskType = C.VIXDISKLIB_DISK_SPLIT_FLAT   // disk split into 2GB extents,
+	// pre-allocated
 	VIXDISKLIB_DISK_VMFS_FLAT                VixDiskLibDiskType = C.VIXDISKLIB_DISK_VMFS_FLAT   // ESX 3.0 and above flat disks
 	VIXDISKLIB_DISK_STREAM_OPTIMIZED         VixDiskLibDiskType = C.VIXDISKLIB_DISK_STREAM_OPTIMIZED   // compressed monolithic sparse
 	VIXDISKLIB_DISK_VMFS_THIN                VixDiskLibDiskType = C.VIXDISKLIB_DISK_VMFS_THIN   // ESX 3.0 and above thin provisioned
@@ -91,7 +89,7 @@ type ConnectParams struct {
 	mode string
 }
 
-type VixDiskLibHandle struct {
+type VixDiskLibHandle struct { // separate go level and C level
 	dli C.VixDiskLibHandle
 }
 

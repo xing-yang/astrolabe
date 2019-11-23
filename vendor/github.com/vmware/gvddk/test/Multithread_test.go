@@ -1,34 +1,25 @@
 package main
 
 import (
+	"fmt"
+	"testing"
+	"github.com/sirupsen/logrus"
 	"github.com/vmware/gvddk/gDiskLib"
 	"github.com/vmware/gvddk/gvddk-high"
-	"fmt"
-	"github.com/sirupsen/logrus"
-	"os"
-	"testing"
 )
 
 // II vs II
 func TestAligned(t *testing.T) {
+	//t.Parallel()
 	fmt.Println("Test Multithread write for aligned case which skip lock: II vs II")
 	var majorVersion uint32 = 6
 	var minorVersion uint32 = 7
-	path := os.Getenv("LIBPATH")
-	if path == "" {
-		t.Skip("Skipping testing if environment variables are not set.")
-	}
+	var path string = "/usr/lib/vmware-vix-disklib"
 	gDiskLib.Init(majorVersion, minorVersion, path)
-	serverName := os.Getenv("IP")
-	thumPrint := os.Getenv("THUMBPRINT")
-	userName := os.Getenv("USERNAME")
-	password := os.Getenv("PWD")
-	fcdId := os.Getenv("FCDID")
-	ds := os.Getenv("DATASTORE")
-	identity := os.Getenv("IDENTITY")
-	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
-		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, gDiskLib.NBD)
+	params := gDiskLib.NewConnectParams("", "10.161.131.94","D7:3E:C5:99:ED:AA:74:18:B4:08:1E:40:1C:B8:D2:10:68:02:84:4F", "administrator@vsphere.local",
+		"Admin!23", "ad39188b-782c-4b00-a4fb-7785378da976", "datastore-58", "", "", "vm-example", "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, "nbd")
+	//var logger logrus.FieldLogger
 	diskReaderWriter, err := gvddk_high.Open(params, logrus.New())
 	if err != nil {
 		gDiskLib.EndAccess(params)
@@ -75,24 +66,16 @@ func TestAligned(t *testing.T) {
 
 // I II III vs II III
 func TestMiss1(t *testing.T) {
+	//t.Parallel()
 	fmt.Println("Test Multithread write for miss aligned case which lock: I II III vs II III")
 	var majorVersion uint32 = 6
 	var minorVersion uint32 = 7
-	path := os.Getenv("LIBPATH")
-	if path == "" {
-		t.Skip("Skipping testing if environment variables are not set.")
-	}
+	var path string = "/usr/lib/vmware-vix-disklib"
 	gDiskLib.Init(majorVersion, minorVersion, path)
-	serverName := os.Getenv("IP")
-	thumPrint := os.Getenv("THUMBPRINT")
-	userName := os.Getenv("USERNAME")
-	password := os.Getenv("PWD")
-	fcdId := os.Getenv("FCDID")
-	ds := os.Getenv("DATASTORE")
-	identity := os.Getenv("IDENTITY")
-	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
-		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, gDiskLib.NBD)
+	params := gDiskLib.NewConnectParams("", "10.161.131.94","D7:3E:C5:99:ED:AA:74:18:B4:08:1E:40:1C:B8:D2:10:68:02:84:4F", "administrator@vsphere.local",
+		"Admin!23", "ad39188b-782c-4b00-a4fb-7785378da976", "datastore-58", "", "", "vm-example", "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, "nbd")
+	//var logger logrus.FieldLogger
 	diskReaderWriter, err := gvddk_high.Open(params, logrus.New())
 	if err != nil {
 		gDiskLib.EndAccess(params)
@@ -139,24 +122,16 @@ func TestMiss1(t *testing.T) {
 
 // I II vs I II III
 func TestMiss2(t *testing.T) {
+	//t.Parallel()
 	fmt.Println("Test Multithread write for miss aligned case which lock: I II vs I II III")
 	var majorVersion uint32 = 6
 	var minorVersion uint32 = 7
-	path := os.Getenv("LIBPATH")
-	if path == "" {
-		t.Skip("Skipping testing if environment variables are not set.")
-	}
+	var path string = "/usr/lib/vmware-vix-disklib"
 	gDiskLib.Init(majorVersion, minorVersion, path)
-	serverName := os.Getenv("IP")
-	thumPrint := os.Getenv("THUMBPRINT")
-	userName := os.Getenv("USERNAME")
-	password := os.Getenv("PWD")
-	fcdId := os.Getenv("FCDID")
-	ds := os.Getenv("DATASTORE")
-	identity := os.Getenv("IDENTITY")
-	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
-		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, gDiskLib.NBD)
+	params := gDiskLib.NewConnectParams("", "10.161.131.94","D7:3E:C5:99:ED:AA:74:18:B4:08:1E:40:1C:B8:D2:10:68:02:84:4F", "administrator@vsphere.local",
+		"Admin!23", "ad39188b-782c-4b00-a4fb-7785378da976", "datastore-58", "", "", "vm-example", "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, "nbd")
+	//var logger logrus.FieldLogger
 	diskReaderWriter, err := gvddk_high.Open(params, logrus.New())
 	if err != nil {
 		gDiskLib.EndAccess(params)
@@ -203,24 +178,16 @@ func TestMiss2(t *testing.T) {
 
 // I II vs II III
 func TestMiss3(t *testing.T) {
+	//t.Parallel()
 	fmt.Println("Test Multithread write for miss aligned case which lock: I II vs II III")
 	var majorVersion uint32 = 6
 	var minorVersion uint32 = 7
-	path := os.Getenv("LIBPATH")
-	if path == "" {
-		t.Skip("Skipping testing if environment variables are not set.")
-	}
+	var path string = "/usr/lib/vmware-vix-disklib"
 	gDiskLib.Init(majorVersion, minorVersion, path)
-	serverName := os.Getenv("IP")
-	thumPrint := os.Getenv("THUMBPRINT")
-	userName := os.Getenv("USERNAME")
-	password := os.Getenv("PWD")
-	fcdId := os.Getenv("FCDID")
-	ds := os.Getenv("DATASTORE")
-	identity := os.Getenv("IDENTITY")
-	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
-		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, gDiskLib.NBD)
+	params := gDiskLib.NewConnectParams("", "10.161.131.94","D7:3E:C5:99:ED:AA:74:18:B4:08:1E:40:1C:B8:D2:10:68:02:84:4F", "administrator@vsphere.local",
+		"Admin!23", "ad39188b-782c-4b00-a4fb-7785378da976", "datastore-58", "", "", "vm-example", "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, "nbd")
+	//var logger logrus.FieldLogger
 	diskReaderWriter, err := gvddk_high.Open(params, logrus.New())
 	if err != nil {
 		gDiskLib.EndAccess(params)
@@ -267,24 +234,16 @@ func TestMiss3(t *testing.T) {
 
 // I II III vs II
 func TestMissAlign(t *testing.T) {
+	//t.Parallel()
 	fmt.Println("Test Multithread write for case which lock: I II III vs II")
 	var majorVersion uint32 = 6
 	var minorVersion uint32 = 7
-	path := os.Getenv("LIBPATH")
-	if path == "" {
-		t.Skip("Skipping testing if environment variables are not set.")
-	}
+	var path string = "/usr/lib/vmware-vix-disklib"
 	gDiskLib.Init(majorVersion, minorVersion, path)
-	serverName := os.Getenv("IP")
-	thumPrint := os.Getenv("THUMBPRINT")
-	userName := os.Getenv("USERNAME")
-	password := os.Getenv("PWD")
-	fcdId := os.Getenv("FCDID")
-	ds := os.Getenv("DATASTORE")
-	identity := os.Getenv("IDENTITY")
-	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
-		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, gDiskLib.NBD)
+	params := gDiskLib.NewConnectParams("", "10.161.131.94","D7:3E:C5:99:ED:AA:74:18:B4:08:1E:40:1C:B8:D2:10:68:02:84:4F", "administrator@vsphere.local",
+		"Admin!23", "ad39188b-782c-4b00-a4fb-7785378da976", "datastore-58", "", "", "vm-example", "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, "nbd")
+	//var logger logrus.FieldLogger
 	diskReaderWriter, err := gvddk_high.Open(params, logrus.New())
 	if err != nil {
 		gDiskLib.EndAccess(params)

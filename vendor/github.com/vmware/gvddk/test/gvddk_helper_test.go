@@ -2,25 +2,21 @@ package main
 
 import (
 	"github.com/vmware/gvddk/gDiskLib"
-	"os"
 	"strings"
 	"testing"
 )
 
 func TestGetThumbPrintForServer(t *testing.T) {
-	host := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-	vmwareThumbprint := os.Getenv("THUMBPRINT")
-	if vmwareThumbprint == "" {
-		t.Skip("Skipping testing if environment variables are not set.")
-	}
-	thumbprint, err := gDiskLib.GetThumbPrintForServer(host, port)
+	host := "www.vmware.com";
+	port := "443";
+	vmwareThumbprint := "E8:F5:BC:3E:11:6B:C1:80:4D:17:E7:45:D1:47:8E:0E:4C:DF:98:F7";
+	thumbprint, err := gDiskLib.GetThumbPrintForServer(host, port);
 	if err != nil {
-		t.Errorf("Thumbprint for %s:%s failed, err = %s\n", host, port, err)
+		t.Errorf("Thumbprint for %s:%s failed, err = %s\n", host, port, err);
 	}
-	t.Logf("Thumbprint for %s:%s is %s\n", host, port, thumbprint)
+	t.Logf("Thumbprint for %s:%s is %s\n", host, port, thumbprint);
 	if strings.Compare(vmwareThumbprint, thumbprint) != 0 {
 		t.Errorf("Thumbprint %s does not match expected thumbprint %s for %s - check to see if cert has been updated at %s\n",
-			thumbprint, vmwareThumbprint, host, host)
+			thumbprint, vmwareThumbprint, host, host);
 	}
 }
