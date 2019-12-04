@@ -362,3 +362,7 @@ func (this *IVDProtectedEntityTypeManager) getDataTransports(id astrolabe.Protec
 
 	return data, md, combined, nil
 }
+
+func (this *IVDProtectedEntityTypeManager) Delete(ctx context.Context, id astrolabe.ProtectedEntityID) error {
+	return errors.New("Not implemented")
+}
