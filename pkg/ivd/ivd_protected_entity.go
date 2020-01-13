@@ -25,8 +25,8 @@ import (
 	"github.com/vmware-tanzu/astrolabe/pkg/astrolabe"
 	vim "github.com/vmware/govmomi/vim25/types"
 	"github.com/vmware/govmomi/vim25/xml"
-	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gDiskLib"
-	gvddk_high "github.com/vmware-tanzu/astrolabe/pkg/gvddk/gvddk-high"
+	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gdisklib"
+	gvddk_high "github.com/vmware-tanzu/astrolabe/pkg/gvddk/gvddk_high"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -110,7 +110,7 @@ func (this IVDProtectedEntity) getDataWriter(ctx context.Context) (io.WriteClose
 	return diskWriter, nil
 }
 
-func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, readOnly bool) (gDiskLib.ConnectParams, error) {
+func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, readOnly bool) (gdisklib.ConnectParams, error) {
 	url := this.ipetm.client.URL()
 	serverName := url.Hostname()
 	userName := this.ipetm.user
@@ -118,8 +118,8 @@ func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, read
 	fcdId := this.id.GetID()
 	vso, err := this.ipetm.vsom.Retrieve(context.Background(), NewVimIDFromPEID(this.id))
 	if err != nil {
-		//return gDiskLib.DiskHandle{}, err
-		return gDiskLib.ConnectParams{}, err
+		//return gdisklib.DiskHandle{}, err
+		return gdisklib.ConnectParams{}, err
 	}
 	datastore := vso.Config.Backing.GetBaseConfigInfoBackingInfo().Datastore.String()
 	datastore = strings.TrimPrefix(datastore, "Datastore:")
@@ -131,18 +131,18 @@ func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, read
 	path := ""
 	var flags uint32
 	if readOnly {
-		flags = gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ | gDiskLib.VIXDISKLIB_FLAG_OPEN_READ_ONLY
+		flags = gdisklib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ | gdisklib.VIXDISKLIB_FLAG_OPEN_READ_ONLY
 	} else {
-		flags = gDiskLib.VIXDISKLIB_FLAG_OPEN_UNBUFFERED
+		flags = gdisklib.VIXDISKLIB_FLAG_OPEN_UNBUFFERED
 	}
 	transportMode := "nbd"
-	thumbPrint, err := gDiskLib.GetThumbPrintForURL(*url)
+	thumbPrint, err := gdisklib.GetThumbPrintForURL(*url)
 	if err != nil {
 		this.logger.Errorf("Failed to get the thumb print for the URL, %s", url.String())
-		return gDiskLib.ConnectParams{}, err
+		return gdisklib.ConnectParams{}, err
 	}
 
-	params := gDiskLib.NewConnectParams("",
+	params := gdisklib.NewConnectParams("",
 		serverName,
 		thumbPrint,
 		userName,

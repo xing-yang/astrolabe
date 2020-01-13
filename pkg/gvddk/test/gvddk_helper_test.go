@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gDiskLib"
+	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gdisklib"
 	"os"
 	"strings"
 	"testing"
@@ -14,7 +14,7 @@ func TestGetThumbPrintForServer(t *testing.T) {
 	if vmwareThumbprint == "" {
 		t.Skip("Skipping testing if environment variables are not set.")
 	}
-	thumbprint, err := gDiskLib.GetThumbPrintForServer(host, port)
+	thumbprint, err := gdisklib.GetThumbPrintForServer(host, port)
 	if err != nil {
 		t.Errorf("Thumbprint for %s:%s failed, err = %s\n", host, port, err)
 	}
