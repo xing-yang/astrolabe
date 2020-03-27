@@ -263,7 +263,7 @@ func (this *IVDProtectedEntityTypeManager) copyInt(ctx context.Context, sourcePE
 	}
 
 	if ourVC && existsInOurVC {
-		md, err := FilterLabelsFromMetadataForVslmAPIs(md, this.logger)
+		md, err := FilterLabelsFromMetadataForVslmAPIs(ctx, md, this.logger)
 		if err != nil {
 			return nil, err
 		}
