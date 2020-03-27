@@ -18,10 +18,10 @@ package gvddk_high
 
 import "C"
 import (
+	"github.com/vmware/gvddk/gDiskLib"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/vmware/gvddk/gDiskLib"
 	"io"
 	"sync"
 )
@@ -110,7 +110,6 @@ func (this DiskReaderWriter) ReadAt(p []byte, off int64) (n int, err error) {
 	return this.diskHandle.ReadAt(p, off)
 }
 
-// Add lock to WriteAt
 func (this DiskReaderWriter) WriteAt(p []byte, off int64) (n int, err error) {
 	return this.diskHandle.WriteAt(p, off)
 }
@@ -133,7 +132,7 @@ func NewDiskReaderWriter(diskHandle DiskConnectHandle, logger logrus.FieldLogger
 	return retVal
 }
 
-type DiskConnectHandle struct { // separate go level and C level
+type DiskConnectHandle struct {
 	mutex  *sync.Mutex
 	dli    gDiskLib.VixDiskLibHandle
 	conn   gDiskLib.VixDiskLibConnection

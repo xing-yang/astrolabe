@@ -16,14 +16,12 @@ limitations under the License.
 
 package gDiskLib
 
-// #cgo CFLAGS: -g -Wall
-// #cgo LDFLAGS: -L../lib/vmware-vix-disklib/lib64 -lvixDiskLib
+// #cgo LDFLAGS: -L../vmware-vix-disklib-distrib/lib64 -lvixDiskLib
 // #include "gvddk_c.h"
 import "C"
 import (
 	"fmt"
 	"unsafe"
-	//"container/list"
 )
 
 //export GoLogWarn
@@ -151,9 +149,9 @@ func Disconnect(connection VixDiskLibConnection) VddkError {
 	return nil
 }
 
-//func Exit() {
-//	C.VixDiskLib_Exit()
-//}
+func Exit() {
+	C.VixDiskLib_Exit()
+}
 
 func Attach(childHandle VixDiskLibHandle, parentHandle VixDiskLibHandle) VddkError {
 	res := C.VixDiskLib_Attach(childHandle.dli, parentHandle.dli)
@@ -183,21 +181,21 @@ func Cleanup(appGlobal ConnectParams, numCleanUp uint32, numRemaining uint32) Vd
 	return nil
 }
 
-//func Clone(dstConnection VixDiskLibConnection, dstPath string, srcConnection VixDiskLibConnection, srcPath string,
-//	       params VixDiskLibCreateParams, progressCallbackData string, overWrite bool) VddkError {
-//	dst := C.CString(dstPath)
-//	defer C.free(unsafe.Pointer(dst))
-//	src := C.CString(srcPath)
-//	defer C.free(unsafe.Pointer(src))
-//	createParams := prepareCreateParams(params)
-//	cstr := C.CString(progressCallbackData)
-//	defer C.free(unsafe.Pointer(cstr))
-//	res := C.Clone(dstConnection.conn, dst, srcConnection.conn, src, createParams, cstr, C._Bool(overWrite))
-//	if res != 0 {
-//		return NewVddkError(uint64(res), fmt.Sprintf("Clone a virtual disk failed. The error code is %d.", res))
-//	}
-//	return nil
-//}
+func Clone(dstConnection VixDiskLibConnection, dstPath string, srcConnection VixDiskLibConnection, srcPath string,
+	params VixDiskLibCreateParams, progressCallbackData string, overWrite bool) VddkError {
+	dst := C.CString(dstPath)
+	defer C.free(unsafe.Pointer(dst))
+	src := C.CString(srcPath)
+	defer C.free(unsafe.Pointer(src))
+	createParams := prepareCreateParams(params)
+	cstr := C.CString(progressCallbackData)
+	defer C.free(unsafe.Pointer(cstr))
+	res := C.Clone(dstConnection.conn, dst, srcConnection.conn, src, createParams, unsafe.Pointer(&cstr), C._Bool(overWrite))
+	if res != 0 {
+		return NewVddkError(uint64(res), fmt.Sprintf("Clone a virtual disk failed. The error code is %d.", res))
+	}
+	return nil
+}
 
 func prepareCreateParams(createSpec VixDiskLibCreateParams) *C.VixDiskLibCreateParams {
 	var createParams *C.VixDiskLibCreateParams
@@ -208,48 +206,29 @@ func prepareCreateParams(createSpec VixDiskLibCreateParams) *C.VixDiskLibCreateP
 	return createParams
 }
 
-//func Create(connection VixDiskLibConnection, path string, createParams VixDiskLibCreateParams, progressCallbackData string) VddkError {
-//	pathName := C.CString(path)
-//	defer C.free(unsafe.Pointer(pathName))
-//	createSpec := prepareCreateParams(createParams)
-//	cstr := C.CString(progressCallbackData)
-//	defer C.free(unsafe.Pointer(cstr))
-//	res := C.Create(connection.conn, pathName, createSpec, cstr)
-//	if res != 0 {
-//		return NewVddkError(uint64(res), fmt.Sprintf("Create a virtual disk failed. The error code is %d.", res))
-//	}
-//	return nil
-//}
-
-//func CreateChild(diskHandle DiskHandle, childPath string, diskType VixDiskLibDiskType, progressCallbackData string) VddkError {
-//	child := C.CString(childPath)
-//	defer C.free(unsafe.Pointer(child))
-//	cstr := C.CString(progressCallbackData)
-//	defer C.free(unsafe.Pointer(cstr))
-//	res := C.CreateChild(diskHandle.dli, child, C.VixDiskLibDiskType(diskType), cstr)
-//	if res != 0 {
-//		return NewVddkError(uint64(res), fmt.Sprintf("Create child virtual disk failed. The error code is %d.", res))
-//	}
-//	return nil
-//}
-
-func FreeErrorText(vixErrorMsg string) {
-	errorMsg := C.CString(vixErrorMsg)
-	defer C.free(unsafe.Pointer(errorMsg))
-	C.VixDiskLib_FreeErrorText(errorMsg)
+func Create(connection VixDiskLibConnection, path string, createParams VixDiskLibCreateParams, progressCallbackData string) VddkError {
+	pathName := C.CString(path)
+	defer C.free(unsafe.Pointer(pathName))
+	createSpec := prepareCreateParams(createParams)
+	cstr := C.CString(progressCallbackData)
+	defer C.free(unsafe.Pointer(cstr))
+	res := C.Create(connection.conn, pathName, createSpec, unsafe.Pointer(&cstr))
+	if res != 0 {
+		return NewVddkError(uint64(res), fmt.Sprintf("Create a virtual disk failed. The error code is %d.", res))
+	}
+	return nil
 }
 
-func FreeInfo(diskInfo *VixDiskLibInfo) {
-	dliInfo, toFree := createDiskInfo(diskInfo)
-	defer freeParams(toFree)
-	C.VixDiskLib_FreeInfo(dliInfo)
-}
-
-func GetErrorText(error VddkError, locale string) string {
-	lc := C.CString(locale)
-	defer C.free(unsafe.Pointer(lc))
-	res := C.VixDiskLib_GetErrorText(C.VixError(error.VixErrorCode()), lc)
-	return C.GoString(res)
+func CreateChild(diskHandle VixDiskLibHandle, childPath string, diskType VixDiskLibDiskType, progressCallbackData string) VddkError {
+	child := C.CString(childPath)
+	defer C.free(unsafe.Pointer(child))
+	cstr := C.CString(progressCallbackData)
+	defer C.free(unsafe.Pointer(cstr))
+	res := C.CreateChild(diskHandle.dli, child, C.VixDiskLibDiskType(diskType), unsafe.Pointer(&cstr))
+	if res != 0 {
+		return NewVddkError(uint64(res), fmt.Sprintf("Create child virtual disk failed. The error code is %d.", res))
+	}
+	return nil
 }
 
 func createDiskInfo(diskInfo *VixDiskLibInfo) (*C.VixDiskLibInfo, []*C.char) {
@@ -273,27 +252,17 @@ func createDiskInfo(diskInfo *VixDiskLibInfo) (*C.VixDiskLibInfo, []*C.char) {
 	return dliInfo, cParams
 }
 
-func GetInfo(handle VixDiskLibHandle, diskInfo *VixDiskLibInfo) VddkError {
-	dliInfo, toFree := createDiskInfo(diskInfo)
-	defer freeParams(toFree)
-	res := C.GetInfo(handle.dli, dliInfo)
+func Grow(connection VixDiskLibConnection, path string, capacity VixDiskLibSectorType, updateGeometry bool, callbackData string) VddkError {
+	filePath := C.CString(path)
+	defer C.free(unsafe.Pointer(filePath))
+	cstr := C.CString(callbackData)
+	defer C.free(unsafe.Pointer(cstr))
+	res := C.Grow(connection.conn, filePath, C.VixDiskLibSectorType(capacity), C._Bool(updateGeometry), unsafe.Pointer(&cstr))
 	if res != 0 {
-		return NewVddkError(uint64(res), fmt.Sprintf("GetInfo failed. The error code is %d.", res))
+		return NewVddkError(uint64(res), fmt.Sprintf("Grow failed. The error code is %d.", res))
 	}
 	return nil
 }
-
-//func Grow(connection VixDiskLibConnection, path string, capacity VixDiskLibSectorType, updateGeometry bool, callbackData string) VddkError {
-//	filePath := C.CString(path)
-//	defer C.free(unsafe.Pointer(filePath))
-//	cstr := C.CString(callbackData)
-//	defer C.free(unsafe.Pointer(cstr))
-//	res := C.Grow(connection.conn, filePath, C.VixDiskLibSectorType(capacity), C._Bool(updateGeometry), cstr)
-//	if res != 0 {
-//		return NewVddkError(uint64(res), fmt.Sprintf("Grow failed. The error code is %d.", res))
-//	}
-//	return nil
-//}
 
 func ListTransportModes() string {
 	res := C.VixDiskLib_ListTransportModes()

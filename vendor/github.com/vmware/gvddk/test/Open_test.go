@@ -2,23 +2,32 @@ package main
 
 import (
 	"fmt"
-	"testing"
 	"github.com/sirupsen/logrus"
 	"github.com/vmware/gvddk/gDiskLib"
 	"github.com/vmware/gvddk/gvddk-high"
+	"os"
+	"testing"
 )
 
 func Test(t *testing.T) {
 	fmt.Println("Test Open")
 	var majorVersion uint32 = 6
 	var minorVersion uint32 = 7
-	var path string = "/usr/lib/vmware-vix-disklib"
+	path := os.Getenv("LIBPATH")
+	if path == "" {
+		t.Skip("Skipping testing if environment variables are not set.")
+	}
 	gDiskLib.Init(majorVersion, minorVersion, path)
-	fmt.Println("Open")
-	params := gDiskLib.NewConnectParams("", "10.161.131.94","D7:3E:C5:99:ED:AA:74:18:B4:08:1E:40:1C:B8:D2:10:68:02:84:4F", "administrator@vsphere.local",
-		"Admin!23", "ad39188b-782c-4b00-a4fb-7785378da976", "datastore-58", "", "", "vm-example", "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, "nbd")
-	//var logger logrus.FieldLogger
+	serverName := os.Getenv("IP")
+	thumPrint := os.Getenv("THUMBPRINT")
+	userName := os.Getenv("USERNAME")
+	password := os.Getenv("PWD")
+	fcdId := os.Getenv("FCDID")
+	ds := os.Getenv("DATASTORE")
+	identity := os.Getenv("IDENTITY")
+	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
+		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, gDiskLib.NBD)
 	diskReaderWriter, err := gvddk_high.Open(params, logrus.New())
 	if err != nil {
 		gDiskLib.EndAccess(params)
@@ -34,14 +43,6 @@ func Test(t *testing.T) {
 
 	// WriteAt
 	fmt.Println("WriteAt start")
-	//buf1 := make([]byte, gDiskLib.VIXDISKLIB_SECTOR_SIZE)
-	//for i,_ := range(buf1) {
-	//	buf1[i] = 'B'
-	//}
-	//n2, err2 := diskReaderWriter.Write(buf1)
-	//fmt.Printf("Write byte n = %d\n", n2)
-	//fmt.Println(err2)
-
 	buf1 := make([]byte, gDiskLib.VIXDISKLIB_SECTOR_SIZE)
 	for i,_ := range(buf1) {
 		buf1[i] = 'E'
@@ -55,15 +56,6 @@ func Test(t *testing.T) {
 	fmt.Printf("Read byte n = %d\n", n2)
 	fmt.Println(buffer2)
 	fmt.Println(err5)
-
-	//// ReadAt
-	//fmt.Printf("ReadAt test\n")
-	//buf2 := make([]byte, gDiskLib.VIXDISKLIB_SECTOR_SIZE)
-	//n1, err5 := diskReaderWriter.Read(buf2)
-	//fmt.Printf("Read byte n = %d\n", n1)
-	//fmt.Println(buf2)
-	//fmt.Println(err5)
-
 
 	diskReaderWriter.Close()
 }
