@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gdisklib"
+	"github.com/vmware/gvddk/gDiskLib"
 	"os"
 	"testing"
 )
@@ -12,7 +12,7 @@ func TestCreate(t *testing.T) {
 	if path == "" {
 		t.Skip("Skipping testing if environment variables are not set.")
 	}
-	res := gdisklib.Init(6, 7, path)
+	res := gDiskLib.Init(6, 7, path)
 	if res != nil {
 		t.Errorf("Init failed, got error code: %d, error message: %s.", res.VixErrorCode(), res.Error())
 	}
@@ -23,18 +23,18 @@ func TestCreate(t *testing.T) {
 	fcdId := os.Getenv("FCDID")
 	ds := os.Getenv("DATASTORE")
 	identity := os.Getenv("IDENTITY")
-	params := gdisklib.NewConnectParams("", serverName,thumPrint, userName,
-		password, fcdId, ds, "", "", identity, "", gdisklib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
-		false, gdisklib.NBD)
-	err1 := gdisklib.PrepareForAccess(params)
+	params := gDiskLib.NewConnectParams("", serverName,thumPrint, userName,
+		password, fcdId, ds, "", "", identity, "", gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ,
+		false, gDiskLib.NBD)
+	err1 := gDiskLib.PrepareForAccess(params)
 	if err1 != nil {
 		t.Errorf("Prepare for access failed. Error code: %d. Error message: %s.", err1.VixErrorCode(), err1.Error())
 	}
-	conn, err2 := gdisklib.ConnectEx(params)
+	conn, err2 := gDiskLib.ConnectEx(params)
 	if err2 != nil {
-		gdisklib.EndAccess(params)
+		gDiskLib.EndAccess(params)
 		t.Errorf("Connect to vixdisk lib failed. Error code: %d. Error message: %s.", err2.VixErrorCode(), err2.Error())
 	}
-	gdisklib.Disconnect(conn)
-	gdisklib.EndAccess(params)
+	gDiskLib.Disconnect(conn)
+	gDiskLib.EndAccess(params)
 }

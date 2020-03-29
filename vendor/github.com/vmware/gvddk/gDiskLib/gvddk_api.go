@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package gdisklib
+package gDiskLib
 
-// #cgo LDFLAGS: -L/usr/local/vmware-vix-disklib-distrib/lib64 -lvixDiskLib
+// #cgo LDFLAGS: -L../vmware-vix-disklib-distrib/lib64 -lvixDiskLib
 // #include "gvddk_c.h"
 import "C"
 import (

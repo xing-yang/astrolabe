@@ -25,8 +25,9 @@ import (
 	"github.com/vmware-tanzu/astrolabe/pkg/astrolabe"
 	vim "github.com/vmware/govmomi/vim25/types"
 	"github.com/vmware/govmomi/vim25/xml"
-	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gdisklib"
-	gvddk_high "github.com/vmware-tanzu/astrolabe/pkg/gvddk/gvddk_high"
+	"github.com/vmware/gvddk/gDiskLib"
+	gvddk_high "github.com/vmware/gvddk/gvddk-high"
+
 	"io"
 	"io/ioutil"
 	"strings"
@@ -110,7 +111,7 @@ func (this IVDProtectedEntity) getDataWriter(ctx context.Context) (io.WriteClose
 	return diskWriter, nil
 }
 
-func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, readOnly bool) (gdisklib.ConnectParams, error) {
+func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, readOnly bool) (gDiskLib.ConnectParams, error) {
 	url := this.ipetm.client.URL()
 	serverName := url.Hostname()
 	userName := this.ipetm.user
@@ -131,18 +132,18 @@ func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, read
 	path := ""
 	var flags uint32
 	if readOnly {
-		flags = gdisklib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ | gdisklib.VIXDISKLIB_FLAG_OPEN_READ_ONLY
+		flags = gDiskLib.VIXDISKLIB_FLAG_OPEN_COMPRESSION_SKIPZ | gDiskLib.VIXDISKLIB_FLAG_OPEN_READ_ONLY
 	} else {
-		flags = gdisklib.VIXDISKLIB_FLAG_OPEN_UNBUFFERED
+		flags = gDiskLib.VIXDISKLIB_FLAG_OPEN_UNBUFFERED
 	}
 	transportMode := "nbd"
-	thumbPrint, err := gdisklib.GetThumbPrintForURL(*url)
+	thumbPrint, err := gDiskLib.GetThumbPrintForURL(*url)
 	if err != nil {
 		this.logger.Errorf("Failed to get the thumb print for the URL, %s", url.String())
-		return gdisklib.ConnectParams{}, err
+		return gDiskLib.ConnectParams{}, err
 	}
 
-	params := gdisklib.NewConnectParams("",
+	params := gDiskLib.NewConnectParams("",
 		serverName,
 		thumbPrint,
 		userName,
