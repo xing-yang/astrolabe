@@ -120,7 +120,7 @@ func (this IVDProtectedEntity) getDiskConnectionParams(ctx context.Context, read
 	vso, err := this.ipetm.vsom.Retrieve(context.Background(), NewVimIDFromPEID(this.id))
 	if err != nil {
 		//return gdisklib.DiskHandle{}, err
-		return gdisklib.ConnectParams{}, err
+		return gDiskLib.ConnectParams{}, err
 	}
 	datastore := vso.Config.Backing.GetBaseConfigInfoBackingInfo().Datastore.String()
 	datastore = strings.TrimPrefix(datastore, "Datastore:")

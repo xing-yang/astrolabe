@@ -29,7 +29,7 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 	"github.com/vmware/govmomi/vslm"
 	vslmtypes "github.com/vmware/govmomi/vslm/types"
-	"github.com/vmware-tanzu/astrolabe/pkg/gvddk/gdisklib"
+	"github.com/vmware/gvddk/gDiskLib"
 	"io"
 	"net/url"
 	"time"
@@ -137,7 +137,7 @@ func newIVDProtectedEntityTypeManagerWithClient(client *govmomi.Client, s3URLBas
 
 	vsom := vslm.NewGlobalObjectManager(vslmClient)
 
-	err := gdisklib.Init(vsphereMajor, vSphereMinor, disklibLib64)
+	err := gDiskLib.Init(vsphereMajor, vSphereMinor, disklibLib64)
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not initialize VDDK")
 	}
