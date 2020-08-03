@@ -279,7 +279,18 @@ func (this *IVDProtectedEntityTypeManager) copyInt(ctx context.Context, sourcePE
 			return nil, err
 		}
 		hasSnapshot := sourcePEInfo.GetID().HasSnapshot()
-		if hasSnapshot {
+		if options == astrolabe.UpdateExistingObject {
+			// TODO: Call Overwrite
+			//func (this IVDProtectedEntity) Overwrite(ctx context.Context, sourcePE astrolabe.ProtectedEntity, params map[string]map[string]interface{},
+			//    overwriteComponents bool) (error)
+			sourcePE, err := this.GetProtectedEntity(ctx, sourcePEInfo.GetID())
+			if err != nil {
+			}
+			var params map[string]map[string]interface{}
+			err = sourcePE.Overwrite(ctx, sourcePE, params, true)
+			if err != nil {
+			}
+		} else if hasSnapshot {
 			createTask, err = this.vsom.CreateDiskFromSnapshot(ctx, NewVimIDFromPEID(sourcePEInfo.GetID()), NewVimSnapshotIDFromPEID(sourcePEInfo.GetID()),
 				sourcePEInfo.GetName(), nil, nil, "")
 			if err != nil {

@@ -180,6 +180,14 @@ func (this *PVCProtectedEntityTypeManager) CreateFromMetadata(ctx context.Contex
 		return nil, err
 	}
 
+	// TODO:
+	// 0. Build IVD PETM?
+	// 1. Get pv from pvc.Spec.VolumeName
+	// 2. pv.Spec.PersistentVolumeSource.CSI.VolumeHandle is FCD ID.
+	// 3. Build Destination IVD PEID based on FCD ID.
+	// 4. Build Source PEID based on SnapshotID (Note: Need to pass SnapshotID thru metadata)
+	// 5. Need to pass BackupRepository thru metadat
+
 	this.logger.Infof("CreateFromMetadata: retrieved ProtectedEntity for ID %s", peID.String())
 	return pe, nil
 }
