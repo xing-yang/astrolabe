@@ -54,8 +54,8 @@ func NewIVDProtectedEntityTypeManager(params map[string]interface{},
 	logger logrus.FieldLogger) (*IVDProtectedEntityTypeManager, error) {
 	logger.Infof("Initializing IVD Protected Entity Manager")
 	retVal := IVDProtectedEntityTypeManager{
-		s3Config:      s3Config,
-		logger:        logger,
+		s3Config: s3Config,
+		logger:   logger,
 	}
 	logger.Infof("Loading new IVD Protected Entity Manager")
 	err := retVal.ReloadConfig(context.Background(), params)
@@ -316,7 +316,7 @@ func (this *IVDProtectedEntityTypeManager) ReloadConfig(ctx context.Context, par
 	this.logger.Debug("Started Load Config of IVD Protected Entity Manager")
 	var newVcConfig *vsphere.VirtualCenterConfig
 	var err error
-	if len(params) == 0  {
+	if len(params) == 0 {
 		// vc operation path, for example createSnapshot.
 		// Used to verify if the connections are still up.
 		// Will be using the last known vcenter config for the checks.
@@ -380,20 +380,25 @@ func (this *IVDProtectedEntityTypeManager) ReloadConfig(ctx context.Context, par
 		this.cnsManager.ResetManager(reloadedVc, cnsClient)
 	}
 
+	// https://github.com/vmware-tanzu/astrolabe/pull/81/files
 	// check whether customized vddk config is provided.
 	// currently only support user to modify vixdisklib nfc log level and transport log level
 	path := ""
-	if _, ok := params[vddkconfig]; !ok {
-		this.logger.Info("No customized vddk log level provided, set vddk log level as default")
-	} else {
-		this.logger.Infof("Customized vddk config provided: %v", params[vddkconfig])
-		vddkConfig := params[vddkconfig].(map[string]string)
-		path, err = util.CreateConfigFile(vddkConfig, this.logger)
-		if err != nil {
-			this.logger.Error("Failed to create config file for vddk. Cannot proceed to init vddk lib")
-			return errors.Wrap(err, "Failed to create config file")
-		}
+	//if _, ok := params[vddkconfig]; !ok {
+	//	this.logger.Info("No customized vddk log level provided, set vddk log level as default")
+	//} else {
+	//this.logger.Infof("Customized vddk config provided: %v", params[vddkconfig])
+	vddkConfig := map[string]string{
+		"vixDiskLib.nfc.LogLevel":       "4",
+		"vixDiskLib.transport.LogLevel": "6",
 	}
+	this.logger.Infof("XY: setting vddk debug level: %v", vddkConfig)
+	path, err = util.CreateConfigFile(vddkConfig, this.logger)
+	if err != nil {
+		this.logger.Error("Failed to create config file for vddk. Cannot proceed to init vddk lib")
+		return errors.Wrap(err, "Failed to create config file")
+	}
+	//}
 	err = disklib.InitEx(vsphereMajor, vSphereMinor, disklibLib64, path)
 	if err != nil {
 		return errors.Wrap(err, "Could not initialize VDDK during config reload")
